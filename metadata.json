@@ -1,0 +1,6 @@
+
+{
+  "name": "Black Cat Security Scanner",
+  "description": "A high-performance automated security scanner and AI-powered analytics platform for web vulnerabilities, featuring real-time insights and intelligent report generation.",
+  "requestFramePermissions": ["camera", "microphone"]
+}

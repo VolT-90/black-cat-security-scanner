@@ -1,0 +1,118 @@
+/* =========================
+   GLOBAL SCROLLBAR
+========================= */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    to bottom,
+    #b6ffec,
+    #7cf8d6,
+    #5eead4
+  );
+
+  border-radius: 999px;
+
+  border: 2px solid #020617;
+
+  /* box-shadow:
+    0 0 10px #5eead4,
+    0 0 20px rgba(94, 234, 212, 0.8),
+    0 0 40px rgba(94, 234, 212, 0.45); */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    to bottom,
+    #d7fff5,
+    #b6ffec,
+    #7cf8d6
+  );
+
+  box-shadow:
+    0 0 14px #7cf8d6,
+    0 0 28px rgba(124, 248, 214, 0.9),
+    0 0 50px rgba(94, 234, 212, 0.55);
+}
+
+/* =========================
+   CHAT SCROLLBAR
+========================= */
+
+.chat-scroll::-webkit-scrollbar {
+  width: 7px;
+}
+
+.chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    to bottom,
+    #b6ffec,
+    #7cf8d6,
+    #5eead4
+  );
+
+  border-radius: 999px;
+
+  box-shadow:
+    0 0 10px rgba(94, 234, 212, 0.9),
+    0 0 25px rgba(94, 234, 212, 0.45);
+}
+
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    to bottom,
+    #d7fff5,
+    #b6ffec,
+    #7cf8d6
+  );
+}
+
+@keyframes toastEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(-180px) scale(0.9);
+    filter: blur(10px);
+  }
+
+  35% {
+    opacity: 0.4;
+    transform: translateY(-80px) scale(0.95);
+    filter: blur(6px);
+  }
+
+  70% {
+    opacity: 0.85;
+    transform: translateY(8px) scale(1.01);
+    filter: blur(1px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes toastExit {
+  0% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) scale(.95);
+  }
+}
