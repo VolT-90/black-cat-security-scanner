@@ -38,8 +38,7 @@ export const Navbar: React.FC = () => {
     if (path === "/") return location.pathname === "/";
 
     return (
-      location.pathname === path ||
-      location.pathname.startsWith(path + "/")
+      location.pathname === path || location.pathname.startsWith(path + "/")
     );
   };
 
@@ -166,7 +165,6 @@ export const Navbar: React.FC = () => {
                         <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10">
                           <LogOut size={17} />
                         </span>
-
                         Sign out
                       </button>
                     </div>
@@ -181,7 +179,6 @@ export const Navbar: React.FC = () => {
                     <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-slate-400 group-hover:border-neon-cyan/40 group-hover:text-neon-cyan">
                       <LogIn size={17} strokeWidth={2.3} />
                     </span>
-
                     Login
                   </Link>
 
@@ -192,7 +189,6 @@ export const Navbar: React.FC = () => {
                     <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-neon-cyan/40 bg-neon-cyan/15">
                       <UserPlus size={17} strokeWidth={2.3} />
                     </span>
-
                     Register
                   </Link>
                 </>
@@ -239,7 +235,6 @@ export const Navbar: React.FC = () => {
                       <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10">
                         <LogOut size={17} />
                       </span>
-
                       Sign out
                     </button>
                   </div>
@@ -283,6 +278,31 @@ export const Navbar: React.FC = () => {
                 </Link>
               );
             })}
+            {!isLoggedIn && (
+              <div className="pt-3 space-y-3 border-t border-neon-cyan/10 mt-4">
+                <Link
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-base font-semibold text-slate-300 transition-all duration-300 hover:border-neon-cyan/30 hover:bg-neon-cyan/5 hover:text-neon-cyan"
+                >
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-slate-400 group-hover:border-neon-cyan/40 group-hover:text-neon-cyan">
+                    <LogIn size={19} strokeWidth={2.3} />
+                  </span>
+                  Login
+                </Link>
+
+                <Link
+                  to="/register"
+                  onClick={() => setIsOpen(false)}
+                  className="group flex items-center gap-4 rounded-2xl border border-neon-cyan/50 bg-neon-cyan/10 px-4 py-3.5 text-base font-bold text-neon-cyan shadow-[0_0_20px_rgba(34,211,238,0.2)] transition-all duration-300 hover:bg-neon-cyan hover:text-[#030712]"
+                >
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-neon-cyan/40 bg-neon-cyan/15">
+                    <UserPlus size={19} strokeWidth={2.3} />
+                  </span>
+                  Register
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}
