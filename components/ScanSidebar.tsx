@@ -71,7 +71,7 @@ export const ScanSidebar: React.FC<ScanSidebarProps> = ({
 
   const handleLogout = () => {
     localStorage.clear();
-    window.location.href = "/login";
+    navigate('/login')
   };
 
   return (

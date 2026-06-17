@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Menu,
   X,
@@ -19,6 +19,8 @@ export const Navbar: React.FC = () => {
   const [isUserOpen, setIsUserOpen] = useState(false);
 
   const location = useLocation();
+
+  const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const token = localStorage.getItem("accessToken");
@@ -50,7 +52,7 @@ export const Navbar: React.FC = () => {
     setIsUserOpen(false);
     setIsOpen(false);
 
-    window.location.href = "/login";
+    navigate('/login')
   };
 
   const toggleMenu = () => {
