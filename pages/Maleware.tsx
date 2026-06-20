@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   UploadCloud,
@@ -25,8 +25,27 @@ type MalwareResult = {
   indicators?: string[];
 };
 
+type CachedMalwareResult = {
+  result: MalwareResult;
+  fileMeta: {
+    name: string;
+    size: number;
+    lastModified: number;
+  };
+};
+
+const LATEST_CACHE_KEY = "malware_latest_result";
+const FILE_CACHE_PREFIX = "malware_result_";
+
+const getFileCacheKey = (file: File) => {
+  return `${FILE_CACHE_PREFIX}${file.name}_${file.size}_${file.lastModified}`;
+};
+
 export default function Malware() {
   const [file, setFile] = useState<File | null>(null);
+  const [cachedFileMeta, setCachedFileMeta] =
+    useState<CachedMalwareResult["fileMeta"] | null>(null);
+
   const [result, setResult] = useState<MalwareResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -43,11 +62,46 @@ export default function Malware() {
     }, 250);
   };
 
+  useEffect(() => {
+    const cached = localStorage.getItem(LATEST_CACHE_KEY);
+
+    if (!cached) return;
+
+    try {
+      const parsed: CachedMalwareResult = JSON.parse(cached);
+
+      setResult(parsed.result);
+      setCachedFileMeta(parsed.fileMeta);
+      scrollToResult();
+    } catch {
+      localStorage.removeItem(LATEST_CACHE_KEY);
+    }
+  }, []);
+
+  const saveResultToCache = (
+    selectedFile: File,
+    scanResult: MalwareResult,
+  ) => {
+    const payload: CachedMalwareResult = {
+      result: scanResult,
+      fileMeta: {
+        name: selectedFile.name,
+        size: selectedFile.size,
+        lastModified: selectedFile.lastModified,
+      },
+    };
+
+    localStorage.setItem(getFileCacheKey(selectedFile), JSON.stringify(payload));
+    localStorage.setItem(LATEST_CACHE_KEY, JSON.stringify(payload));
+    setCachedFileMeta(payload.fileMeta);
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
 
     setResult(null);
     setError("");
+    setCachedFileMeta(null);
 
     if (!selectedFile) {
       setFile(null);
@@ -55,6 +109,21 @@ export default function Malware() {
     }
 
     setFile(selectedFile);
+
+    const cached = localStorage.getItem(getFileCacheKey(selectedFile));
+
+    if (cached) {
+      try {
+        const parsed: CachedMalwareResult = JSON.parse(cached);
+
+        setResult(parsed.result);
+        setCachedFileMeta(parsed.fileMeta);
+        localStorage.setItem(LATEST_CACHE_KEY, cached);
+        scrollToResult();
+      } catch {
+        localStorage.removeItem(getFileCacheKey(selectedFile));
+      }
+    }
   };
 
   const openFilePicker = () => {
@@ -65,6 +134,8 @@ export default function Malware() {
     setFile(null);
     setResult(null);
     setError("");
+    setCachedFileMeta(null);
+    localStorage.removeItem(LATEST_CACHE_KEY);
 
     if (inputRef.current) {
       inputRef.current.value = "";
@@ -73,6 +144,22 @@ export default function Malware() {
 
   const handleScan = useCallback(async () => {
     if (!file || loading) return;
+
+    const cached = localStorage.getItem(getFileCacheKey(file));
+
+    if (cached) {
+      try {
+        const parsed: CachedMalwareResult = JSON.parse(cached);
+
+        setResult(parsed.result);
+        setCachedFileMeta(parsed.fileMeta);
+        localStorage.setItem(LATEST_CACHE_KEY, cached);
+        scrollToResult();
+        return;
+      } catch {
+        localStorage.removeItem(getFileCacheKey(file));
+      }
+    }
 
     setLoading(true);
     setResult(null);
@@ -101,6 +188,7 @@ export default function Malware() {
       };
 
       setResult(scanResult);
+      saveResultToCache(file, scanResult);
       scrollToResult();
     } catch (err) {
       console.log("Malware scan error:", err);
@@ -116,6 +204,9 @@ export default function Malware() {
   }, [file, loading]);
 
   const danger = result?.status === "malware";
+
+  const displayedFileName = file?.name || cachedFileMeta?.name;
+  const displayedFileSize = file?.size || cachedFileMeta?.size;
 
   return (
     <div className="min-h-screen bg-[#020617] text-white overflow-hidden">
@@ -184,12 +275,12 @@ export default function Malware() {
 
                     <div className="min-w-0">
                       <p className="truncate font-bold text-slate-200">
-                        {file ? file.name : "Choose APK file"}
+                        {displayedFileName || "Choose APK file"}
                       </p>
 
                       <p className="mt-1 text-sm text-slate-500">
-                        {file
-                          ? `${(file.size / 1024 / 1024).toFixed(2)} MB`
+                        {displayedFileSize
+                          ? `${(displayedFileSize / 1024 / 1024).toFixed(2)} MB`
                           : "Upload suspicious APK file"}
                       </p>
                     </div>
@@ -230,7 +321,7 @@ export default function Malware() {
                   )}
                 </AnimatePresence>
 
-                {file && (
+                {displayedFileName && (
                   <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-neon-cyan/20 bg-neon-cyan/5 p-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex items-center gap-4">
                       <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neon-cyan/10 text-neon-cyan">
@@ -238,10 +329,14 @@ export default function Malware() {
                       </div>
 
                       <div>
-                        <p className="font-bold text-white">{file.name}</p>
-                        <p className="text-sm text-slate-400">
-                          {(file.size / 1024 / 1024).toFixed(2)} MB
+                        <p className="font-bold text-white">
+                          {displayedFileName}
                         </p>
+                        {displayedFileSize && (
+                          <p className="text-sm text-slate-400">
+                            {(displayedFileSize / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        )}
                       </div>
                     </div>
 

@@ -12,7 +12,7 @@ import {
   AlertCircle,
   Loader2,
 } from "lucide-react";
-import { Logo } from "../components/Logo";
+
 import { loginApi } from "../services/authApi";
 
 export const Login: React.FC = () => {
@@ -54,6 +54,10 @@ export const Login: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // const handleGoogleLogin = () => {
+  // window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
+  // };
 
   return (
     <main className="relative min-h-[calc(100vh-80px)] overflow-hidden bg-[#030712] px-4 py-8 flex items-center justify-center">
